@@ -1,0 +1,225 @@
+{
+  "realm": "wlcg",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  
+  "accessTokenLifespan": 3600,
+  "accessTokenLifespanForImplicitFlow": 3600,
+  "ssoSessionIdleTimeout": 21600,
+  "ssoSessionMaxLifespan": 86400,
+  "offlineSessionIdleTimeout": 2592000,
+  "offlineSessionMaxLifespanEnabled": true,
+  "offlineSessionMaxLifespan": 2592000,
+  
+  "groups": [
+    {
+      "name": "atlas",
+      "path": "/atlas",
+      "subGroups": [
+        {
+          "name": "production",
+          "path": "/atlas/production"
+        },
+        {
+          "name": "users",
+          "path": "/atlas/users"
+        }
+      ]
+    }
+  ],
+  
+  "users": [
+    {
+      "username": "alice",
+      "email": "alice@atlas.example.org",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Alice",
+      "lastName": "Researcher",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "alice123",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "eduperson_assurance": ["https://refeds.org/assurance/profile/espresso"]
+      }
+    },
+    {
+      "username": "bob",
+      "email": "bob@atlas.example.org",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Bob",
+      "lastName": "Analyst",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "bob123",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "eduperson_assurance": ["https://refeds.org/assurance/profile/cappuccino"]
+      }
+    }
+  ],
+  
+  "clients": [
+    {
+      "clientId": "rucio-service",
+      "name": "Rucio Service Account",
+      "description": "Service account for Rucio data management",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "rucio-secret-key-12345",
+      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "access.token.lifespan": "3600",
+        "refresh.token.max.reuse": "0"
+      },
+      "redirectUris": ["http://localhost:*"],
+      "webOrigins": ["http://localhost:*"]
+    },
+    {
+      "clientId": "fts-service",
+      "name": "FTS Service Account",
+      "description": "Service account for File Transfer Service",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "fts-secret-key-67890",
+      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "publicClient": false,
+      "redirectUris": ["http://localhost:*"],
+      "webOrigins": ["http://localhost:*"]
+    },
+    {
+      "clientId": "wlcg-cli",
+      "name": "WLCG Command Line Client",
+      "description": "CLI client for users",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "redirectUris": ["http://localhost:*"],
+      "webOrigins": ["http://localhost:*"]
+    }
+  ],
+  
+  "clientScopes": [
+    {
+      "name": "wlcg",
+      "description": "WLCG Token Profile Scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      },
+      "protocolMappers": [
+        {
+          "name": "wlcg-version-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "wlcg.ver",
+            "claim.value": "1.2",
+            "jsonType.label": "String",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "false"
+          }
+        },
+        {
+          "name": "wlcg-groups-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "wlcg.groups",
+            "full.path": "true",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "false"
+          }
+        },
+        {
+          "name": "eduperson-assurance-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "eduperson_assurance",
+            "user.attribute": "eduperson_assurance",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+            "name": "audience-mapper",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-audience-mapper",
+            "consentRequired": false,
+            "config": {
+                "included.custom.audience": "https://wlcg.cern.ch/jwt/v1/any",
+                "access.token.claim": "true"
+            }
+        }
+      ]
+    },
+    {
+      "name": "storage.read",
+      "description": "Storage read scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      }
+    },
+    {
+      "name": "storage.create",
+      "description": "Storage create scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      }
+    },
+    {
+      "name": "storage.modify",
+      "description": "Storage modify scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      }
+    }
+  ],
+  
+  "defaultDefaultClientScopes": [
+    "wlcg"
+  ],
+  
+  "defaultOptionalClientScopes": [
+    "storage.read",
+    "storage.create",
+    "storage.modify"
+  ]
+}
